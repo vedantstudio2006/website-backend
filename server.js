@@ -19,7 +19,7 @@ app.post('/api/contact', async (req, res) => {
     const { name, email, phone } = req.body;
 
     await client.connect();
-    const db = client.db('my_website_db'); // Replace with your DB name
+    const db = client.db('exim'); // Replace with your DB name
     const collection = db.collection('users');
 
     const result = await collection.insertOne({
@@ -38,7 +38,3 @@ app.post('/api/contact', async (req, res) => {
     await client.close();
   }
 });
-
-app.listen(()=>{
-  console.log("listen port at");
-})
