@@ -1,40 +1,35 @@
+require('dotenv').config(); // Load environment variables
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const Contact = require('./models/user');
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors()); // CRITICAL: Allows your Vite app to talk to this server
-app.use(express.json()); // Parses incoming JSON requests
+app.use(cors({
+  origin:"https://avskexim.com/",
+}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+// Connect to MongoDB using the env variable
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB via Env"))
+  .catch(err => console.error("DB Connection Error:", err));
 
+// The POST Route
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, phone } = req.body;
 
-    await client.connect();
-    const db = client.db('exim'); // Replace with your DB name
-    const collection = db.collection('users');
+    // Create a new document using the model
+    const newContact = new Contact({ name, email, phone });
 
-    const result = await collection.insertOne({
-      fullname: name,
-      email: email,
-      phoneNumber: phone,
-      createdAt: new Date(),
-    });
+    // Save to the database
+    await newContact.save();
 
-    res.status(201).json({ success: true, data: result });
+    res.status(201).json({ message: "Data saved successfully!" });
   } catch (error) {
-    console.error("MongoDB Error:", error);
-    res.status(500).json({ error: 'Failed to save contact info' });
-  } finally {
-    // Closes the connection after the operation completes or fails
-    await client.close();
+    res.status(500).json({ error: "Failed to Saved the Data" });
   }
 });
