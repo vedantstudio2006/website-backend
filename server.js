@@ -7,7 +7,16 @@ const Contact = require('./models/user');
 const app = express();
 
 app.use(cors({
-  origin:"https://avskexim.com/",
+  origin: [
+    'https://avskexim.com',
+    'https://avskexim.com/',
+    'https://www.avskexim.com', 
+    'https://www.avskexim.com/',
+    'https://website-avskexim-admin-page.vercel.app',
+    'http://localhost:5173' // Add your live frontend URL later
+  ],
+  methods: ['GET', 'POST', 'PUT','PATCH'],
+  credentials: true
 }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
